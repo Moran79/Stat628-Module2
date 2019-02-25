@@ -1,3 +1,18 @@
+# 一些思路
+
+我们是否需要先判断一句话是主观/客观呢？开始我想的是不需要，因为review都是主观的，但我后来想，难免会有一些客观的描述信息在里面呢？如果能把这些客观的信息去掉的话会不会更加准确？
+
+有一个LDA可以根据主题分类？正好
+
+
+
+
+# Problems Encountered
+1. nltk.word_tokenize(sentence) would change `don't` to `[do, n't]` . But `n't` could not be used by nltk.sentiment.util.mark_negation. Thus I decide to change all the `n't` to not.
+
+
+
+
 # 第一阶段
 
 
