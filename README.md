@@ -6,8 +6,38 @@
 
 
 
+康贤盛2/26课
+
+Yelp Fusion API
+
+对于token的矩阵，设定一个范围，在这之内的单词才保留
+
+Miss spelling 在token之后最后改一下
+
+Foreign language not filtered/translated 【translation to English不同语言混杂不行】
+
+Hidden Markov 可以取出一些Phrase
+
+老师想查tea，但是查出来一堆中国火锅【奶茶】
+
+老师也做了star的distribution
+
+Negative-binomial /Gamma 可以解释word-count distribution
+
+老师在对于某一个特定单词出现次数上，用了boolean的方式，define了mean。
+
+画了一个各个单词出现的五星频率图，画了一个各个茶种的五星频率图【Scaled Word Count 每一类除于各类星星】
+
+如果关注一下service类的单词，会发现负面情绪过多。当我们对食物不满的时候，我们不会再关注事物本身，而是自己的情绪以及一些其他的不着边的东西
+
+EDA是什么东西？ Bonferroni correction ANOVA 去判断某个word是不是很关键
+
+叹号问号挺关键的，polarization
 
 # Problems Encountered
+
+
+
 1. nltk.word_tokenize(sentence) would change `don't` to `[do, n't]` . But `n't` could not be used by nltk.sentiment.util.mark_negation. Thus I decide to change all the `n't` to not.
 
 
@@ -73,15 +103,20 @@ RMSE就是MSE的平方根
 
 
 
-# 具体做的步骤
+# Submission
 
-## 随便猜猜
+## Guessing
 
 **只想用一个数字估计全部的评分**，为了最小化RMSE，需要用样本均值。开始试了用3分来估计, RMSE大约为1.62920，实在是不行。随后我发现因为样本是skewed，接下来我们面临第一个问题：**如何画出总体的histogram？** 这个我准备之后再放到server做，1000个数据跑了3.68秒，预计5364626行需要5.48小时。
 
 暂时的解决方案是：我先选取了10组样本量为1000的数据，计算1~5星各自出现频率，计算出来10个样本均值，发现他们的median是3.7。用3.7估计总体之后发现RMSE变成了1.46367。我想这是我们在什么都不做的时候，能拿到的最好结果了。
 
 这一万个数据中，1~5星出现的个数分别为：[1514, 812, 1062, 2250, 4362]
+
+### Result
+
+* Use 3 to predict all: RMSE: 1.62920
+* Use 3.7 to predict all: RMSE: 1.46367 [3.7 is sample average]
 
 ### 用到的文件
 
@@ -91,7 +126,43 @@ RMSE就是MSE的平方根
 * fake.sh用来生成答案集
 * submit.csv是答案集
 
+## Use positive and negative words
+
+建立一个好坏词词典，统计一个文本中好坏词的数量，然后用一个分段函数进行预测。具体预测方法如下表：
+
+|    Prediction     | Good_num = 0 |          Good_num != 0          |
+| :---------------: | :----------: | :-----------------------------: |
+|  **Bad_num = 0**  |      3       |              1.33               |
+| **Bad_num ! = 0** |     4.66     | Weighted average with ratio 1:5 |
+
+### Run Time
+
+2933.73 s $\approx$ 48.9 min
+
+### Result
+
+- RMSE: 1.10213
+
+### File
+
+Files are stored in Submission/Just_good_and_bad
+
+* just_good_and_bad.py: Python code
+* submit.csv: submission file
 
 
 
+
+
+暂存网页：
+
+https://www.yelp.com/login?return_url=%2Fdevelopers%2Fv3%2Fmanage_app
+
+https://github.com/lwang535/STAT628_Module2_Group5/blob/master/code/produce_word_star_matrix.py
+
+https://futrueboy.iteye.com/blog/944792
+
+https://zhuanlan.zhihu.com/p/28053918
+
+threshold for information gain
 
