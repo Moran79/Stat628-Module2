@@ -4,7 +4,11 @@
 
 有一个LDA可以根据主题分类？正好
 
+Find aspect/attribute/target of sentiment
 
+虽然BiLSTM与attention几乎统治了NLP
+
+https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html#from-occurrences-to-frequencies
 
 康贤盛2/26课
 
@@ -20,8 +24,6 @@ Hidden Markov 可以取出一些Phrase
 
 老师想查tea，但是查出来一堆中国火锅【奶茶】
 
-老师也做了star的distribution
-
 Negative-binomial /Gamma 可以解释word-count distribution
 
 老师在对于某一个特定单词出现次数上，用了boolean的方式，define了mean。
@@ -30,9 +32,42 @@ Negative-binomial /Gamma 可以解释word-count distribution
 
 如果关注一下service类的单词，会发现负面情绪过多。当我们对食物不满的时候，我们不会再关注事物本身，而是自己的情绪以及一些其他的不着边的东西
 
-EDA是什么东西？ Bonferroni correction ANOVA 去判断某个word是不是很关键
+EDA (Experimental Data Analysis) Bonferroni correction ANOVA 去判断某个word是不是很关键
 
-叹号问号挺关键的，polarization
+做完Naive Bayes / SVM / MaxEnt / Logistic / Linear Regression
+TF-IDF 加权 / Boolean
+
+## 其他组带来的Inspiration
+
+Lemmatiza ? 这是啥 红麒麟组解释了将各种形式变成原型
+
+LDA 李天奇组用了这个 Topics  Gibs sambling 来选择topics 画了一个蓝色和红色
+
+他们还调查了用户是否return？怎么做到的[只是通过Back来判断的]
+
+JST / Word2Vec
+
+Mosaic plots 他们选了名词
+
+把字符变成utf-8 去掉外国字符
+
+emoji
+
+adversative phrases  / clauses
+
+Logistic what do you predict
+
+trend model
+
+NN: K-max
+
+
+
+
+
+
+
+
 
 # Problems Encountered
 
