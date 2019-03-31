@@ -3,6 +3,9 @@ library(lubridate)
 library(reshape)
 library(mltools)
 library(data.table)
+library(plotly)
+library(TSA)
+library(tseries)
 
 # Random Guessing ---------------------------------------------------------
 
@@ -104,4 +107,149 @@ ggplot(data = dat)+
         axis.title=element_text(size=20))
 order(dat[dat$stars ==5,4], decreasing = T)[1:5]
 dat[dat$stars ==5,][410,]
+
+
+
+
+# Distribution PLots ------------------------------------------------------
+
+
+# Wicked Spoon
+dat = read.csv('/Users/moran/PycharmProjects/leetcode/attributes.csv',header = F)
+colnames(dat) <- c('line','legs','selection','sushi','rib','sum')
+
+dat = dat / dat$sum
+dat = dat[,-ncol(dat)]
+dat = as.data.frame(apply(dat,2, function(x) x / sum(x)))
+dat_tmp = melt(dat)
+dat_tmp$star = c('One','Two','Three','Four','Five')
+dat_tmp %>%
+  ggplot(aes(x = star, y = value)) +
+  geom_col(aes(color = star, fill = star), alpha = 0.75)+
+  scale_x_discrete(limits = c('One','Two','Three','Four','Five'))+
+  labs(y = 'Scaled Comparable Frenquency')+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=20))+
+  facet_wrap(~variable,ncol=5)+
+  theme(strip.text.x = element_text(size = 30))
+
+
+# Other restaurant
+dat = read.csv('/Users/moran/PycharmProjects/leetcode/attributes_other.csv',header = F)
+colnames(dat) <- c('line','legs','selection','sushi','rib','sum')
+
+dat = dat / dat$sum
+dat = dat[,-ncol(dat)]
+dat = as.data.frame(apply(dat,2, function(x) x / sum(x)))
+dat_tmp = melt(dat)
+dat_tmp$star = c('One','Two','Three','Four','Five')
+dat_tmp %>%
+  ggplot(aes(x = star, y = value)) +
+  geom_col(aes(color = star, fill = star), alpha = 0.75)+
+  scale_x_discrete(limits = c('One','Two','Three','Four','Five'))+
+  labs(y = 'Scaled Comparable Frenquency', x = 'star in other restaurants')+
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=20))+
+  facet_wrap(~variable,ncol=5)+
+  theme(strip.text.x = element_text(size = 30))
+
+
+
+
+# Wilcoxon two-sample test ------------------------------------------------
+dat = read.csv('/Users/moran/PycharmProjects/leetcode/attributes.csv',header = F)
+colnames(dat) <- c('line','legs','selection','sushi','rib','sum')
+dat_reverse = as.data.frame(apply(dat,2, function(x) dat$sum-x))
+
+# Print out the p-value
+for(i in 1:5){
+  x_tmp = rep(1:5, dat[,i])
+  y_tmp = rep(1:5, dat_reverse[,i])
+  fit = wilcox.test(x = x_tmp, y = y_tmp, alternative = 'less')
+  print(fit$p.value)
+}
+
+
+
+# Chi-Square Test ---------------------------------------------------------
+
+
+dat = read.csv('/Users/moran/PycharmProjects/leetcode/attributes.csv',header = F)
+colnames(dat) <- c('line','legs','selection','sushi','rib','sum')
+dat_reverse = as.data.frame(apply(dat,2, function(x) dat$sum-x))
+
+# Print out the p-value
+for(i in 1:5){
+  dat_use = cbind(dat[,i],dat_reverse[,i])
+  fit = chisq.test(dat_use)
+  print(fit$p.value)
+}
+
+
+
+# Seasonal Trend ----------------------------------------------------------
+
+dat = read.csv('/Users/moran/PycharmProjects/leetcode/df_wic.csv') %>%
+  .[,c(-1,-4)]
+dat$date = as_datetime(dat$date)
+dat = dat[order(dat$date),]
+dat$year = year(dat$date)
+dat$month = month(dat$date)
+dat$day = day(dat$date)
+
+dt = dat %>%
+  dplyr::group_by(year,month) %>%
+  summarise(star_mean = mean(stars))
+dt$date_new =  date_new = as_date(paste(dt$year,'-',dt$month,'-01', sep = ''))
+
+pick <- function(condition){
+  function(d) d %>% filter_(condition)
+}
+
+ggplot(data = dt, aes(x = date_new, y = star_mean))+
+  geom_point()+
+  geom_line()+
+  geom_point(data = pick(~month == 12),colour = "red", size = 4)+
+  labs(x = 'Time', y = 'Average Star In Each Month')+
+  theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20))
+
+
+fit <- ts(dt$star_mean, frequency = 12, start = c(2010,12))
+fit_comp <- decompose(fit)
+plot(fit_comp)
+adf.test(fit_comp$random[!is.na(fit_comp$random)], k = 12) # p = 0.0173
+
+
+df_seasonal = data.frame(seasonal = as.numeric(fit_comp$seasonal[2:13]), date = factor(month.abb, levels = month.abb, ordered = TRUE))
+ggplot(data = df_seasonal,aes(x = date, y = seasonal))+
+  geom_point()+
+  geom_line(group = 1)+
+  geom_point(data = pick(~date == 'Dec'),colour = "red", size = 7, shape = 17)+
+  theme(axis.title.x = element_text(size = 20), axis.title.y = element_text(size = 20))
+  
+
+
+# Pre-defined Season ------------------------------------------------------
+
+df_wic = read.csv('/Users/moran/PycharmProjects/leetcode/df_wic.csv')
+df_wic$date = as_datetime(df_wic$date)
+df_wic$month = month(df_wic$date)
+df_wic$season = factor(c('Spring', 'Summer','Autumn','Winter')[lubridate::quarter(df_wic$date, fiscal_start = 3)], levels = c('Spring', 'Summer','Autumn','Winter'), ordered = TRUE)
+
+df_season = 1
+
+df_wic %>%
+  group_by(season)
+  
+
+
+
+ggplot(data = df_wic)+
+  geom_bar(aes(x = stars))+
+  facet_wrap(~season, nrow = 1)
+
+
+
+
+
 
