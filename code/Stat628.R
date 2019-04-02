@@ -221,7 +221,7 @@ kruskal.test(stars~season, data = df_wic)
 
 # Seasonal Trend ----------------------------------------------------------
 
-dat = read.csv('/Users/moran/PycharmProjects/leetcode/df_wic.csv') %>%
+dat = read.csv('/Users/moran/Google_Drive/Course/628/Proj2/data/generated data/df_wic.csv') %>%
   .[,c(-1,-4)]
 dat$date = as_datetime(dat$date)
 dat = dat[order(dat$date),]
@@ -249,8 +249,7 @@ ggplot(data = dt, aes(x = date_new, y = star_mean))+
 fit <- ts(dt$star_mean, frequency = 12, start = c(2010,12))
 fit_comp <- decompose(fit)
 plot(fit_comp)
-adf.test(fit_comp$random[!is.na(fit_comp$random)], k = 12) # p = 0.0173
-
+Box.test(fit_comp$random[!is.na(fit_comp$random)], type = 'Ljung-Box') # p = 0.3545
 
 df_seasonal = data.frame(seasonal = as.numeric(fit_comp$seasonal[2:13]), date = factor(month.abb, levels = month.abb, ordered = TRUE))
 ggplot(data = df_seasonal,aes(x = date, y = seasonal))+
@@ -306,12 +305,5 @@ ggplot(data = dat_tmp) +
         axis.title=element_text(size=20))+
   theme(strip.text.x = element_text(size = 30))+
   facet_wrap(~variable)
-
-
-
-
-
-
-
 
 
