@@ -42,7 +42,7 @@ dat_plot = dat %>%
             star2 = sum(stars_2),
             star3 = sum(stars_3),
             star4 = sum(stars_4),
-            star5 = sum(stars_5)) 
+            star5 = sum(stars_5))
   gather(star1:star5, key = 'class', value = 'star')
 
 
